@@ -17,6 +17,7 @@ The following server-side components are packaged with the TinyMCE SDK:
 | Allowed Origins				| ephox-allowed-origins.war 	| Supplies configuration for server components to communicate with your application. In order to use the *Spellchecking* or *Image Tools Proxy* features, you **must** install and configure this component.|
 | [Spellchecking]({{ site.baseurl }}/enterprise/check-spelling/) 				| ephox-spelling.war		|Spell checking service for TinyMCE Enterprise.|
 | [Image Tools Proxy]({{ site.baseurl }}/plugins/imagetools/)				| ephox-image-proxy.war		|Image proxy service for the Image Tools plugin.|
+| Hyperlink Checking				| ephox-hyperlinking.war		| Hyperlink validity checking service. |
 
 
 This guide will help you set up the server-side components for the above-mentioned features, and show you how to use them in conjunction with editor clients. The steps required are:
@@ -47,6 +48,7 @@ You’ll need to ensure you deploy the following WAR files packaged with the Tin
 - ephox-allowed-origins.war
 - ephox-spelling.war
 - ephox-image-proxy.war
+- ephox-hyperlinking.war
 
 The easiest way to deploy these files is to simply drag and drop them into the webapps directory of your Tomcat/Jetty server (or equivalent folder of another Java application server), and then restart the server.
 
@@ -62,7 +64,8 @@ More information on deploying components/applications:
 
 Services require a configuration file named `application.conf` to be referenced by the application server.
 
-This configuration file will require you to enter two pieces of information:
+The allowed-origins configuration element will need to be specified in order for the other server-side components to work.
+It includes the following two pieces of information:
 
 - `origins` - which domains are allowed to communicate with the server-side editor features.
 - `url` - the location of the allowed-origins checking service itself.
@@ -141,6 +144,28 @@ ephox{
            origins=["http://myCMS", "https://myCMS", "http://myCMS:4141"]
            url = "http://myCMS:8080/ephox-allowed-origins/cors"
   }
+}
+````
+
+#### link-checking.cache (optional)
+
+This element configures the hyperlinking service's built-in cache. When a hyperlink is checked and confirmed valid, the result is cached to save unnecessary network traffic in the future.
+
+Default settings are automatically configured, meaning these settings optional.
+
+The `capacity` attribute sets the capacity of the cache. The default setting is 500.
+
+The `timeToLiveInSeconds` attribute sets the time-to-live of elements of the cache, measured in seconds. This is the maximum total amount of time that an element is allowed to remain in the cache. The default setting is 86400 seconds, which is one day.
+
+The `timeToIdleInSeconds` attribute sets the time-to-idle of elements of the cache, measured in seconds. This is the maximum amount of time that an element will remain in the cache if it is not being accessed. The default setting is 3600 seconds, which is one hour.
+
+````
+ephox {
+    link-checking.cache {
+        capacity = 500
+        timeToLiveInSeconds = 86400
+        timeToIdleInSeconds = 3600
+    }
 }
 ````
 
